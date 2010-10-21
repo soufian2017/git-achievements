@@ -4,7 +4,7 @@ $Env:Path = "/bin;$Env:Path"
 $gaDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 
 $gitX = [Environment]::GetEnvironmentVariable("gitAchievementsGitPath", "User");
-if(!(test-path $gitX))
+if(! $gitX)
 {
 	$gitEx = 'Git\bin\sh.exe';
 	$gitX = $Env:ProgramFiles, ${Env:ProgramFiles(x86)}, $Env:ProgramW6432 | %{ "$_\$gitEx" } | ?{ Test-Path $_ } | select -first 1
