@@ -2,15 +2,17 @@
 $pathBackup = $Env:Path
 $Env:Path = "/bin;$Env:Path"
 $gaDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+$shExe = [Environment]::GetEnvironmentVariable("gitAchievementsShExePath", "User")
 
-$gitX = [Environment]::GetEnvironmentVariable("gitAchievementsGitPath", "User");
-if(! $gitX)
-{
-	$gitEx = 'Git\bin\sh.exe';
-	$gitX = $Env:ProgramFiles, ${Env:ProgramFiles(x86)}, $Env:ProgramW6432 | %{ "$_\$gitEx" } | ?{ Test-Path $_ } | select -first 1
-	[Environment]::SetEnvironmentVariable("gitAchievementsGitPath", $gitX, "User")
+if(!$shExe) {
+	$shExe = Get-Command sh.exe -ErrorAction SilentlyContinue | Select -First 1 -Exp Definition
+	if(!$shExe) {
+		$gitCmd = Get-Command git.cmd | Select -First 1 -Exp Definition | Split-Path -Parent
+		$shExe = "$($gitCmd | Split-Path -Parent)\bin\sh.exe"
+	}
+	[Environment]::SetEnvironmentVariable("gitAchievementsShExePath", $shExe, "User")
 }
 
-&  $gitX "$gaDir\git-achievements" $args
+& $shExe "$gaDir\git-achievements" $args
 $Env:Path = $pathBackup
 
